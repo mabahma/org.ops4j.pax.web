@@ -138,9 +138,15 @@ public class HttpServiceTCIntegrationTest extends ITestBase {
 			installWarBundle.stop();
 		}
 		
-		String path = "http://127.0.0.1:8282/";
-        LOG.info("testSubPath - call path {}", path);
-        testClient.testWebPath(path, 404);
+
+
+		HttpTestClientFactory.createDefaultTestClient()
+				.withReturnCode(404)
+				.doGETandExecuteTest("http://127.0.0.1:8282/");
+
+//		String path = "http://127.0.0.1:8282/";
+//		LOG.info("testSubPath - call path {}", path);
+//        testClient.testWebPath(path, 404);
 	}
 	
 	@Test
@@ -196,10 +202,14 @@ public class HttpServiceTCIntegrationTest extends ITestBase {
 	public void testRestartServlet() throws Exception {
 	    if (installWarBundle != null) {
             installWarBundle.stop();
+			installWarBundle.start();
         }
-	    
-	    installWarBundle.start();
 
-        testClient.testWebPath("http://127.0.0.1:8282/lall/blubb", "Path Info: /lall/blubb");
+		HttpTestClientFactory.createDefaultTestClient()
+				.withResponseAssertion("Response must contain Path Info: /lall/blubb'",
+						response -> response.contains("Path Info: /lall/blubb"))
+				.doGETandExecuteTest("http://127.0.0.1:8282/lall/blubb");
+
+//        testClient.testWebPath("http://127.0.0.1:8282/lall/blubb", "Path Info: /lall/blubb");
 	}
 }
